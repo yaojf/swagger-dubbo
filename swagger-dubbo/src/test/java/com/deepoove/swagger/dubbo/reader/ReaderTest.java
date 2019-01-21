@@ -21,7 +21,7 @@ public class ReaderTest {
 	
 	@SuppressWarnings({  "serial" })
 	@Test
-	public void testApplyParameters(){
+	public void testApplyParameters() throws Exception {
 		Swagger swagger = new Swagger();
 		Reader.read(swagger, new HashMap<Class<?>, Object>(){{
 			put(InterfaceServiceTest.class, new InterfaceServiceImplTest());

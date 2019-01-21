@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.deepoove.swagger.dubbo.util.AopTargetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,6 +72,9 @@ public class DubboHttpController {
 		    return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 		ref = entry.getValue();
+		// 寻找动态代理类本身对象
+		ref = AopTargetUtils.getTarget(ref);
+
 		HttpMatch httpMatch = new HttpMatch(entry.getKey(), ref.getClass());
 		Method[] interfaceMethods = httpMatch.findInterfaceMethods(methodName);
 

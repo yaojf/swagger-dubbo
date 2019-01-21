@@ -2,6 +2,7 @@ package com.deepoove.swagger.dubbo.web;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,12 +42,14 @@ public class SwaggerDubboController {
 	private String httpContext;
 	@Value("${swagger.dubbo.enable:true}")
 	private boolean enable = true;
+	@Value("${swagger.servlet.context:}")
+	private String servletContext;
 
 	@RequestMapping(value = DEFAULT_URL, 
 	        method = RequestMethod.GET, 
 	        produces = {"application/json; charset=utf-8", HAL_MEDIA_TYPE})
 	@ResponseBody
-	public ResponseEntity<Json> getApiList() throws JsonProcessingException {
+	public ResponseEntity<Json> getApiList() throws Exception {
 		
 		if (!enable){
 			return new ResponseEntity<Json>(HttpStatus.NOT_FOUND);
@@ -66,10 +69,16 @@ public class SwaggerDubboController {
 
 		Map<Class<?>, Object> interfaceMapRef = dubboServiceScanner.interfaceMapRef();
 		if (null != interfaceMapRef) {
-			Reader.read(swagger, interfaceMapRef, httpContext);
+			Reader.read(swagger, interfaceMapRef, getContextPath(servletContext, httpContext));
 		}
 		swaggerDocCache.setSwagger(swagger);
 		return new ResponseEntity<Json>(new Json(io.swagger.util.Json.mapper().writeValueAsString(swagger)), HttpStatus.OK);
 	}
 
+	private String getContextPath(String servletContext, String httpContext) {
+		if (StringUtils.isNotBlank(servletContext)) {
+			return servletContext + "/" + httpContext;
+		}
+		return httpContext;
+	}
 }

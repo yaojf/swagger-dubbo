@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.deepoove.swagger.dubbo.util.AopTargetUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiKeyAuthDefinition;
@@ -65,7 +66,7 @@ public class Reader {
 	}
 
 	public static void read(Swagger swagger, Map<Class<?>, Object> interfaceMapRef,
-			String httpContext) {
+			String httpContext) throws Exception {
 		final Reader reader = new Reader(swagger);
 		List<Entry<Class<?>, Object>> arrayList = new ArrayList<Entry<Class<?>, Object>>(interfaceMapRef.entrySet());
 		Collections.sort(arrayList, new Comparator<Entry<Class<?>, Object>>() {
@@ -76,7 +77,7 @@ public class Reader {
 		});
 		for (Entry<Class<?>, Object> entry : arrayList) {
 			final ReaderContext context = new ReaderContext(swagger,
-					entry.getValue().getClass(), entry.getKey(), httpContext, null, false,
+					AopTargetUtils.getTarget(entry.getValue()).getClass(), entry.getKey(), httpContext, null, false,
 					new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(),
 					new ArrayList<Parameter>());
 			reader.read(context);

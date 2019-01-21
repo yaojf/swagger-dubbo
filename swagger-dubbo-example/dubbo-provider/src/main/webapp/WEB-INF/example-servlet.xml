@@ -40,6 +40,7 @@
     <!-- 跨域支持 -->
 	<mvc:cors>
 		<mvc:mapping path="/swagger-dubbo/**" allowed-origins="*" />
+		<mvc:mapping path="/h/**" allowed-origins="*" />
 	</mvc:cors>
 
 </beans>

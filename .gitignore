@@ -13,4 +13,6 @@ bin/
 hs_err_pid*
 /target/
 **/target/
+.idea
+*.iml
 

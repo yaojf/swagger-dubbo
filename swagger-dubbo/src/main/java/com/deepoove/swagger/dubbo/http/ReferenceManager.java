@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -74,7 +75,8 @@ public class ReferenceManager {
                 reference.setRegistry(service.getRegistry());
                 reference.setRegistries(service.getRegistries());
                 reference.setInterface(service.getInterfaceClass());
-                reference.setVersion(service.getVersion());
+                reference.setVersion(StringUtils.defaultString(service.getVersion(), service.getProvider().getVersion()));
+                reference.setGroup(StringUtils.defaultString(service.getGroup(), service.getProvider().getGroup()));
                 interfaceMapProxy.put(service.getInterfaceClass(), reference.get());
                 return reference.get();
             }

@@ -31,7 +31,7 @@
 	
 	<!-- <context:property-placeholder location="classpath*:swagger-dubbo.properties" /> -->
 
-	<bean class="com.deepoove.swagger.dubbo.example.SwaggerDubboConfig" />
+	<bean class="com.deepoove.swagger.dubbo.spring.SwaggerDubboConfig" />
 	<bean class="com.deepoove.swagger.dubbo.example.AnnotationScanConfig" />
 
 	<mvc:resources location="/dist/" mapping="/dist/**" />

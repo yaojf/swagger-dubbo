@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
 import com.deepoove.swagger.dubbo.util.AopTargetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +37,12 @@ import io.swagger.util.PrimitiveType;
 public class DubboHttpController {
 
 	private static Logger logger = LoggerFactory.getLogger(DubboHttpController.class);
-	
+
 	private static final String CLUSTER_RPC = "rpc";
 
 	@Value("${swagger.dubbo.enable:true}")
 	private boolean enable = true;
-	
+
 	@Value("${swagger.dubbo.cluster:rpc}")
 	private String cluster = CLUSTER_RPC;
 
@@ -64,9 +65,9 @@ public class DubboHttpController {
 		Object ref = null;
 		Method method = null;
 		Object result = null;
-		
+
 		Entry<Class<?>, Object> entry = ReferenceManager.getInstance().getRef(interfaceClass);
-		
+
 		if (null == entry){
 		    logger.info("No Ref Service FOUND.");
 		    return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
@@ -88,7 +89,10 @@ public class DubboHttpController {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 		String[] parameterNames = NameDiscover.parameterNameDiscover.getParameterNames(method);
-		
+
+		// 保存具体实现类方法
+		Method realMethod = method;
+
 		logger.info("[Swagger-dubbo] Invoke by " + cluster);
 		if (CLUSTER_RPC.equals(cluster)){
     		ref = ReferenceManager.getInstance().getProxy(interfaceClass);
@@ -107,8 +111,8 @@ public class DubboHttpController {
 			result = method.invoke(ref);
 		} else {
 			Object[] args = new Object[parameterNames.length];
-			Type[] parameterTypes = method.getGenericParameterTypes();
-			Class<?>[] parameterClazz = method.getParameterTypes();
+			Type[] parameterTypes = realMethod.getGenericParameterTypes();
+			Class<?>[] parameterClazz = realMethod.getParameterTypes();
 
 			for (int i = 0; i < parameterNames.length; i++) {
 				Object suggestPrameterValue = suggestPrameterValue(parameterTypes[i],
@@ -130,7 +134,7 @@ public class DubboHttpController {
 		} else {
 			if (null == parameter) return null;
             try {
-                return Json.mapper().readValue(parameter, cls);
+                return JSON.parseObject(parameter, type);
             } catch (Exception e) {
                 throw new IllegalArgumentException("The parameter value [" + parameter + "] should be json of [" + cls.getName() + "] Type.", e);
             }
